@@ -18,10 +18,10 @@ import (
 )
 
 type ActJitter struct {
-	mutex       sync.RWMutex `webformhide:"" stringformhide:""`
+	mutex       sync.RWMutex `prettystring:"hide"`
 	name        string
-	startTime   time.Time
-	lastActTime time.Time
+	startTime   time.Time `prettystring:"simple"`
+	lastActTime time.Time `prettystring:"simple"`
 	count       int64
 	lastJitter  float64
 	lastDur     time.Duration
@@ -50,10 +50,6 @@ func New(name string) *ActJitter {
 
 func (jt *ActJitter) GetAvg() time.Duration {
 	return jt.avgDur
-	// if jt.count == 0 {
-	// 	return 0
-	// }
-	// return time.Duration(int64(jt.lastActTime.Sub(jt.startTime)) / jt.count)
 }
 
 func (jt *ActJitter) Act() float64 {
@@ -80,6 +76,16 @@ func (jt *ActJitter) GetInFrameProgress() float64 {
 	if rtn > 1 {
 		rtn = 1
 	}
+	return rtn
+}
+
+func (jt *ActJitter) GetInFrameProgress2() float64 {
+	if jt.count == 0 {
+		return 0
+	}
+	thisDur := time.Now().Sub(jt.lastActTime).Seconds()
+	avg := jt.GetAvg().Seconds()
+	rtn := thisDur / avg
 	return rtn
 }
 
